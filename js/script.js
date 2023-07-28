@@ -1,71 +1,49 @@
 document.addEventListener('DOMContentLoaded', () =>{
 //--------------------------HEADER-FUNCTIONAL-TABS
-const tabs = document.querySelectorAll('.tabheader__item'),
-tabContent = document.querySelectorAll('.tabcontent'),
-tabParent = document.querySelector('.tabheader__items');
-const tabContainer = document.getElementById('#tab_container');
+
+// tabContent = document.querySelectorAll('.tabcontent'),
+// tabParent = document.querySelector('.tabheader__items');
 
 
-console.log(tabContent);
 
+// function showTabContent(i = 0){
+// // tabContent[i].classList.add('show', 'fade');
+// // tabContent[i].classList.remove('hide');
+// // tabs[i].classList.add('tabheader__item_active');
 
-// tabContainer.style.display = 'none';
+// tabContent.forEach(item =>{
+//     item.classList.remove('hide');
+//     item.classList.add('show', 'fade');
 
+// });
 
-function hideTabContent(){
+// tabs.forEach(item => {
+//     item.classList.add('tabheader__item_active');
+// })
+// }
+// showTabContent();
 
-    tabContent.forEach(item =>{
-    item.classList.add('hide');
-    item.classList.remove('show', 'fade');
-    console.log(item);
+// tabParent.addEventListener('click', (event) =>{
+// const target = event.target;
 
-    item.style.display = 'none';
-}),
-
-tabs.forEach(item =>{
-    console.log(item);
-    item.classList.remove('tabheader__item_active');
-});
-console.log(tabs);
-}
-// hideTabContent();
-setInterval(hideTabContent(), 5000);
-function showTabContent(i = 0){
-// tabContent[i].classList.add('show', 'fade');
-// tabContent[i].classList.remove('hide');
-// tabs[i].classList.add('tabheader__item_active');
-
-tabContent.forEach(item =>{
-    item.classList.remove('hide');
-    item.classList.add('show', 'fade');
-
-});
-
-tabs.forEach(item => {
-    item.classList.add('tabheader__item_active');
-})
-}
-showTabContent();
-
-tabParent.addEventListener('click', (event) =>{
-const target = event.target;
-
-if(target && target.classList.contains('tabheader__item')){
-tabs.forEach((item) =>{
-    if(target === item){
-        hideTabContent();
-        showTabContent();
-    }
-});
-}
-});
+// if(target && target.classList.contains('tabheader__item')){
+// tabs.forEach((item) =>{
+//     if(target === item){
+//         hideTabContent();
+//         showTabContent();
+//     }
+// });
+// }
+// });
 
     function tabContentRender(descr, image){
         let tabContainer = document.getElementById('tab_container');
+        
+        const tabs = document.querySelectorAll('.tabheader__item');
         let element = document.createElement('div');
 
             element.innerHTML = `
-                <div class="tabcontent" id="tab_content">
+                <div class="tabcontent">
                     <img src="${image}" alt="vegy">
                     <div class="tabcontent__descr" id="descr">
                         ${descr}
@@ -73,27 +51,75 @@ tabs.forEach((item) =>{
                 </div>
             `;
             tabContainer.appendChild(element);
-            return tabContainer;
-    }
 
+            const tabContent = document.querySelectorAll('.tabcontent');
+
+            function hideTabContent(){
+                tabContent.forEach(item =>{
+                    item.classList.add('hide');
+                    item.classList.remove('show', 'fade');
+                })
+            
+                tabs.forEach(item =>{
+                    item.classList.remove('active');
+                });
+            }
+            hideTabContent();
+
+            function showTabContent(i = 0){
+                tabContent[i].classList.add('show', 'fade');
+                tabContent[i].classList.remove('hide');
+                tabs[i].classList.add('active');
+
+                tabs.forEach(item =>{
+                    // item.classList.add('tabheader__item_active');
+                    item.classList.add('active');
+                });
+            }
+            showTabContent();
+            return tabContainer, hideTabContent, showTabContent;
+    }
+    
     function tabNameRender(name){
         let tabHeaderItems = document.getElementById('tabheader__items');
         let block = document.createElement('div');
-
+        
+        
         block.innerHTML = `
-                    <div class="tabheader__item tabheader__item_active">${name}</div>
+                    <div class="tabheader__item ">${name}</div>
                 `;
 
         tabHeaderItems.appendChild(block);
+
+        const tabs = document.querySelectorAll('.tabheader__item');
+        tabParent = document.querySelector('.tabheader__items');
+
+        tabParent.addEventListener('click', (event) =>{
+            const target = event.target;
+            
+            if(target && target.classList.contains('tabheader__item')){
+            tabs.forEach((item, i) =>{
+                if(target === item){
+                    const hideTabContent = tabContentRender();
+                    const showTabContent = tabContentRender();
+                    hideTabContent();
+                    showTabContent(i);
+                }
+            });
+            }
+            });
         return tabHeaderItems;
     }
 
+
+    
     getTabs('http://127.0.0.1:8000/api/V1/tabs')
     .then(data => {
         data.data.forEach(({name, descr, image}) => {
             tabContentRender(descr, image);
             tabNameRender(name);
             console.log(name);
+            
         })
     })
     async function getTabs(url){
@@ -106,8 +132,7 @@ tabs.forEach((item) =>{
         return await res.json();
     }
 
-    let descr = document.getElementById('#descr');
-   console.log(descr);
+
 //-----------------------PROJECT-TIMER
 const deadline = '2023-10-20';
 
@@ -244,11 +269,11 @@ class MenuCard {
                 </div>
             `;
         this.parent.append(element);
+        
     }
 }
 
-let description = document.querySelector('.menu__item-descr');
-console.log(description);
+
 getResource('http://127.0.0.1:8000/api/V1/cards')
 .then(data => {
     data.forEach(({image, altimg, title, descr, price}) => {

@@ -4,6 +4,9 @@
 .hide{
     display: none;
 }
+.active{
+    font-weight: 800;
+}
 .fade{
     animation-name: fade;
     animation-duration: 1.5s;
