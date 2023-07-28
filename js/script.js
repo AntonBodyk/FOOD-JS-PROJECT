@@ -1,46 +1,115 @@
 document.addEventListener('DOMContentLoaded', () =>{
 //--------------------------HEADER-FUNCTIONAL-TABS
-    const tabs = document.querySelectorAll('.tabheader__item'),
-          tabContent = document.querySelectorAll('.tabcontent'),
-          tabParent = document.querySelector('.tabheader__items');
+const tabs = document.querySelectorAll('.tabheader__item'),
+tabContent = document.querySelectorAll('.tabcontent'),
+tabParent = document.querySelector('.tabheader__items');
+const tabContainer = document.getElementById('#tab_container');
 
-    function headTabContent(){
-        tabContent.forEach(item =>{
-            item.classList.add('hide');
-            item.classList.remove('show', 'fade');
-        });
 
-        tabs.forEach(item =>{
-            item.classList.remove('tabheader__item_active');
-        });
+console.log(tabContent);
 
-        
+
+// tabContainer.style.display = 'none';
+
+
+function hideTabContent(){
+
+    tabContent.forEach(item =>{
+    item.classList.add('hide');
+    item.classList.remove('show', 'fade');
+    console.log(item);
+
+    item.style.display = 'none';
+}),
+
+tabs.forEach(item =>{
+    console.log(item);
+    item.classList.remove('tabheader__item_active');
+});
+console.log(tabs);
+}
+// hideTabContent();
+setInterval(hideTabContent(), 5000);
+function showTabContent(i = 0){
+// tabContent[i].classList.add('show', 'fade');
+// tabContent[i].classList.remove('hide');
+// tabs[i].classList.add('tabheader__item_active');
+
+tabContent.forEach(item =>{
+    item.classList.remove('hide');
+    item.classList.add('show', 'fade');
+
+});
+
+tabs.forEach(item => {
+    item.classList.add('tabheader__item_active');
+})
+}
+showTabContent();
+
+tabParent.addEventListener('click', (event) =>{
+const target = event.target;
+
+if(target && target.classList.contains('tabheader__item')){
+tabs.forEach((item) =>{
+    if(target === item){
+        hideTabContent();
+        showTabContent();
     }
-    headTabContent();
+});
+}
+});
 
-    function showTabContent(i = 0){
-        tabContent[i].classList.add('show', 'fade');
-        tabContent[i].classList.remove('hide');
-        tabs[i].classList.add('tabheader__item_active');
+    function tabContentRender(descr, image){
+        let tabContainer = document.getElementById('tab_container');
+        let element = document.createElement('div');
+
+            element.innerHTML = `
+                <div class="tabcontent" id="tab_content">
+                    <img src="${image}" alt="vegy">
+                    <div class="tabcontent__descr" id="descr">
+                        ${descr}
+                    </div>
+                </div>
+            `;
+            tabContainer.appendChild(element);
+            return tabContainer;
     }
-    showTabContent();
 
-    tabParent.addEventListener('click', (event) =>{
-        const target = event.target;
+    function tabNameRender(name){
+        let tabHeaderItems = document.getElementById('tabheader__items');
+        let block = document.createElement('div');
 
-        if(target && target.classList.contains('tabheader__item')){
-            tabs.forEach((item, i) =>{
-                if(target === item){
-                    headTabContent();
-                    showTabContent(i);
-                }
-            });
+        block.innerHTML = `
+                    <div class="tabheader__item tabheader__item_active">${name}</div>
+                `;
+
+        tabHeaderItems.appendChild(block);
+        return tabHeaderItems;
+    }
+
+    getTabs('http://127.0.0.1:8000/api/V1/tabs')
+    .then(data => {
+        data.data.forEach(({name, descr, image}) => {
+            tabContentRender(descr, image);
+            tabNameRender(name);
+            console.log(name);
+        })
+    })
+    async function getTabs(url){
+        let res = await fetch(url);
+
+        if (!res.ok) {
+            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
         }
-    });
 
+        return await res.json();
+    }
 
+    let descr = document.getElementById('#descr');
+   console.log(descr);
 //-----------------------PROJECT-TIMER
-const deadline = '2022-10-20';
+const deadline = '2023-10-20';
 
 function getTime(endtime){
     let days, hours,minutes,seconds;
@@ -138,8 +207,8 @@ window.addEventListener('scroll', showModalByScroll);
 
 //-------------------CLASESS FOR TABLES 
 class MenuCard {
-    constructor(src, alt, title, descr, price, parentSelector, ...classes) {
-        this.src = src;
+    constructor(image, alt, title, descr, price, parentSelector, ...classes) {
+        this.image = image;
         this.alt = alt;
         this.title = title;
         this.descr = descr;
@@ -165,7 +234,7 @@ class MenuCard {
         }
         
         element.innerHTML = `
-           <img src=${this.src} alt=${this.alt}>
+           <img src=${this.image} alt=${this.alt}>
                 <h3 class="menu__item-subtitle">${this.title}</h3>
                 <div class="menu__item-descr">${this.descr}</div>
                 <div class="menu__item-divider"></div>
@@ -178,11 +247,12 @@ class MenuCard {
     }
 }
 
- 
-getResource('http://localhost:3000/menu')
+let description = document.querySelector('.menu__item-descr');
+console.log(description);
+getResource('http://127.0.0.1:8000/api/V1/cards')
 .then(data => {
-    data.forEach(({img, altimg, title, descr, price}) => {
-        new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+    data.forEach(({image, altimg, title, descr, price}) => {
+        new MenuCard(image, altimg, title, descr, price, '.menu .container').render();
     });
 });
 
@@ -190,38 +260,28 @@ getResource('http://localhost:3000/menu')
 //---------------------PROJECT-FORMS
 const forms = document.querySelectorAll('form');
 const message = {
-    loading: 'img/form/spinner.svg',
+    loading: 'img/spinner-icon.webp',
     success: 'Спасибо! Скоро мы с вами свяжемся',
     failure: 'Что-то пошло не так...'
 };
 
 forms.forEach(item => {
-    bindPostData(item);
+    postData(item);
 });
 
-const postData = async (url, data) => {
-    let res = await fetch(url, {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: data
-    });
+// const postData = async (url, data) => {
+//     let res = await fetch(url, {
+//         method: "POST",
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: data
+//     });
 
-    return await res.json();
-};
+//     return await res.json();
+// };
 
-async function getResource(url) {
-    let res = await fetch(url);
-
-    if (!res.ok) {
-        throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-    }
-
-    return await res.json();
-}
-
-function bindPostData(form) {
+function postData(form) {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -230,14 +290,25 @@ function bindPostData(form) {
         statusMessage.style.cssText = `
             display: block;
             margin: 0 auto;
+            width: 30px;
+            height: 30px;
         `;
         form.insertAdjacentElement('afterend', statusMessage);
     
         const formData = new FormData(form);
 
-        const json = JSON.stringify(Object.fromEntries(formData.entries()));
+        const object = {};
+        formData.forEach(function(value, key){
+            object[key] = value;
+        });
 
-        postData('http://localhost:3000/requests', json)
+        fetch('http://127.0.0.1:8000/api/V1/buyers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(object)
+        }).then(data => data.text())
         .then(data => {
             console.log(data);
             showThanksModal(message.success);
@@ -249,6 +320,47 @@ function bindPostData(form) {
         });
     });
 }
+
+async function getResource(url) {
+    let res = await fetch(url);
+
+    if (!res.ok) {
+        throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+    }
+
+    return await res.json();
+}
+
+// function bindPostData(form) {
+//     form.addEventListener('submit', (e) => {
+//         e.preventDefault();
+
+//         let statusMessage = document.createElement('img');
+//         statusMessage.src = message.loading;
+//         statusMessage.style.cssText = `
+//             display: block;
+//             margin: 0 auto;
+//             width: 30px;
+//             height: 30px;
+//         `;
+//         form.insertAdjacentElement('afterend', statusMessage);
+    
+//         const formData = new FormData(form);
+
+//         const json = JSON.stringify(Object.fromEntries(formData.entries()));
+
+//         postData('http://localhost:3000/requests', json)
+//         .then(data => {
+//             console.log(data);
+//             showThanksModal(message.success);
+//             statusMessage.remove();
+//         }).catch(() => {
+//             showThanksModal(message.failure);
+//         }).finally(() => {
+//             form.reset();
+//         });
+//     });
+// }
 
 function showThanksModal(message) {
     const prevModalDialog = document.querySelector('.modal__dialog');
@@ -421,4 +533,4 @@ function getDynamicInfo(selector) {
     getDynamicInfo('#age');
 
 });
-    
+
