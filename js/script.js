@@ -1,51 +1,14 @@
 document.addEventListener('DOMContentLoaded', () =>{
 //--------------------------HEADER-FUNCTIONAL-TABS
 
-// tabContent = document.querySelectorAll('.tabcontent'),
-// tabParent = document.querySelector('.tabheader__items');
-
-
-
-// function showTabContent(i = 0){
-// // tabContent[i].classList.add('show', 'fade');
-// // tabContent[i].classList.remove('hide');
-// // tabs[i].classList.add('tabheader__item_active');
-
-// tabContent.forEach(item =>{
-//     item.classList.remove('hide');
-//     item.classList.add('show', 'fade');
-
-// });
-
-// tabs.forEach(item => {
-//     item.classList.add('tabheader__item_active');
-// })
-// }
-// showTabContent();
-
-// tabParent.addEventListener('click', (event) =>{
-// const target = event.target;
-
-// if(target && target.classList.contains('tabheader__item')){
-// tabs.forEach((item) =>{
-//     if(target === item){
-//         hideTabContent();
-//         showTabContent();
-//     }
-// });
-// }
-// });
-
     function tabContentRender(descr, image){
         let tabContainer = document.getElementById('tab_container');
-        
-        const tabs = document.querySelectorAll('.tabheader__item');
         let element = document.createElement('div');
 
             element.innerHTML = `
                 <div class="tabcontent">
                     <img src="${image}" alt="vegy">
-                    <div class="tabcontent__descr" id="descr">
+                    <div class="tabcontent__descr">
                         ${descr}
                     </div>
                 </div>
@@ -53,7 +16,9 @@ document.addEventListener('DOMContentLoaded', () =>{
             tabContainer.appendChild(element);
 
             const tabContent = document.querySelectorAll('.tabcontent');
-
+            console.log(tabContent);
+            const tabs = document.querySelectorAll('.tabheader__item');
+            
             function hideTabContent(){
                 tabContent.forEach(item =>{
                     item.classList.add('hide');
@@ -67,14 +32,12 @@ document.addEventListener('DOMContentLoaded', () =>{
             hideTabContent();
 
             function showTabContent(i = 0){
+                console.log(tabContent);
                 tabContent[i].classList.add('show', 'fade');
                 tabContent[i].classList.remove('hide');
-                tabs[i].classList.add('active');
+                // tabs[i].classList.add('active');
+                
 
-                tabs.forEach(item =>{
-                    // item.classList.add('tabheader__item_active');
-                    item.classList.add('active');
-                });
             }
             showTabContent();
             return tabContainer, hideTabContent, showTabContent;
@@ -92,16 +55,17 @@ document.addEventListener('DOMContentLoaded', () =>{
         tabHeaderItems.appendChild(block);
 
         const tabs = document.querySelectorAll('.tabheader__item');
-        tabParent = document.querySelector('.tabheader__items');
-
+        const tabParent = document.querySelector('.tabheader__items');
+        console.log(tabs);
+        
         tabParent.addEventListener('click', (event) =>{
             const target = event.target;
             
             if(target && target.classList.contains('tabheader__item')){
             tabs.forEach((item, i) =>{
                 if(target === item){
+                    const showTabContent = tabContentRender(i);
                     const hideTabContent = tabContentRender();
-                    const showTabContent = tabContentRender();
                     hideTabContent();
                     showTabContent(i);
                 }
@@ -119,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () =>{
             tabContentRender(descr, image);
             tabNameRender(name);
             console.log(name);
-            
         })
     })
     async function getTabs(url){
@@ -294,18 +257,6 @@ forms.forEach(item => {
     postData(item);
 });
 
-// const postData = async (url, data) => {
-//     let res = await fetch(url, {
-//         method: "POST",
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: data
-//     });
-
-//     return await res.json();
-// };
-
 function postData(form) {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -355,37 +306,6 @@ async function getResource(url) {
 
     return await res.json();
 }
-
-// function bindPostData(form) {
-//     form.addEventListener('submit', (e) => {
-//         e.preventDefault();
-
-//         let statusMessage = document.createElement('img');
-//         statusMessage.src = message.loading;
-//         statusMessage.style.cssText = `
-//             display: block;
-//             margin: 0 auto;
-//             width: 30px;
-//             height: 30px;
-//         `;
-//         form.insertAdjacentElement('afterend', statusMessage);
-    
-//         const formData = new FormData(form);
-
-//         const json = JSON.stringify(Object.fromEntries(formData.entries()));
-
-//         postData('http://localhost:3000/requests', json)
-//         .then(data => {
-//             console.log(data);
-//             showThanksModal(message.success);
-//             statusMessage.remove();
-//         }).catch(() => {
-//             showThanksModal(message.failure);
-//         }).finally(() => {
-//             form.reset();
-//         });
-//     });
-// }
 
 function showThanksModal(message) {
     const prevModalDialog = document.querySelector('.modal__dialog');
