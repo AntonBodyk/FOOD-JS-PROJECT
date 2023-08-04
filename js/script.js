@@ -1,6 +1,26 @@
 document.addEventListener('DOMContentLoaded', () =>{
 //--------------------------HEADER-FUNCTIONAL-TABS
 
+    function hideTabContent(){
+        const tabContent = document.querySelectorAll('.tabcontent');
+        const tabs = document.querySelectorAll('.tabheader__item');
+        tabContent.forEach(item =>{
+            item.classList.add('hide');
+            item.classList.remove('show', 'fade');
+        })
+
+        tabs.forEach(item =>{
+            item.classList.remove('active');
+        });
+    }
+    function showTabContent(i = 0){
+        const tabContent = document.querySelectorAll('.tabcontent');
+        tabContent[i].classList.add('show', 'fade');
+        tabContent[i].classList.remove('hide');
+        // tabs[i].classList.add('active');
+                
+    }
+
     function tabContentRender(descr, image){
         let tabContainer = document.getElementById('tab_container');
         let element = document.createElement('div');
@@ -15,32 +35,7 @@ document.addEventListener('DOMContentLoaded', () =>{
             `;
             tabContainer.appendChild(element);
 
-            const tabContent = document.querySelectorAll('.tabcontent');
-            console.log(tabContent);
-            const tabs = document.querySelectorAll('.tabheader__item');
-            
-            function hideTabContent(){
-                tabContent.forEach(item =>{
-                    item.classList.add('hide');
-                    item.classList.remove('show', 'fade');
-                })
-            
-                tabs.forEach(item =>{
-                    item.classList.remove('active');
-                });
-            }
-            hideTabContent();
-
-            function showTabContent(i = 0){
-                console.log(tabContent);
-                tabContent[i].classList.add('show', 'fade');
-                tabContent[i].classList.remove('hide');
-                // tabs[i].classList.add('active');
-                
-
-            }
-            showTabContent();
-            return tabContainer, hideTabContent, showTabContent;
+            return tabContainer;
     }
     
     function tabNameRender(name){
@@ -64,8 +59,6 @@ document.addEventListener('DOMContentLoaded', () =>{
             if(target && target.classList.contains('tabheader__item')){
             tabs.forEach((item, i) =>{
                 if(target === item){
-                    const showTabContent = tabContentRender(i);
-                    const hideTabContent = tabContentRender();
                     hideTabContent();
                     showTabContent(i);
                 }
@@ -84,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () =>{
             tabNameRender(name);
             console.log(name);
         })
+        hideTabContent();
+        showTabContent();
     })
     async function getTabs(url){
         let res = await fetch(url);
